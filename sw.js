@@ -1,5 +1,16 @@
-const CACHE='deal-hunter-v0.2.0';
-const ASSETS=['./','./index.html','./styles.css','./deal-engine.js','./app.js','./manifest.webmanifest'];
+const CACHE='deal-hunter-v0.3.0';
+const ASSETS=[
+  './',
+  './index.html',
+  './styles.css',
+  './provider.css',
+  './deal-engine.js',
+  './providers/provider-core.js',
+  './providers/sample-providers.js',
+  './deal-catalog.js',
+  './app.js',
+  './manifest.webmanifest'
+];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
