@@ -1,4 +1,4 @@
-const CACHE='deal-hunter-v0.3.0-provider2';
+const CACHE='deal-hunter-v0.4.0';
 const ASSETS=[
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS=[
   './deal-engine.js',
   './providers/provider-core.js',
   './providers/sample-providers.js',
+  './providers/rakuten-provider.js',
   './deal-catalog.js',
   './app.js',
   './manifest.webmanifest'
