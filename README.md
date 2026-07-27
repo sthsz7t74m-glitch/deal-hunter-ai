@@ -2,21 +2,24 @@
 
 Amazon・楽天市場・Yahoo!ショッピングなどの価格と過去相場を比較し、明らかに安い商品を見つけるスマホ向けWebアプリです。
 
-## v0.3.0
+## v0.4.0
 
-- ショップごとのProvider層を追加
-- Amazon・楽天市場・Yahoo!・価格.comを個別Providerとして管理
-- Providerから取得した価格を同一商品単位で自動統合
-- 型番・JAN・商品キーを使える正規化インターフェース
-- 表示価格だけでなく送料・ポイントを含む実質価格に対応
-- Providerごとの接続状態・取得価格数を画面に表示
-- 一部Providerが失敗しても、成功したProviderだけでランキングを生成
+- 楽天市場の公式APIデータを扱うLive Providerを追加
+- APIキーをブラウザへ埋め込まないGitHub Actions取得方式
+- 2時間ごとに楽天市場の監視商品を自動検索
+- `deal-data`ブランチへ軽量な価格フィードを自動公開
+- 公開データ取得失敗時は端末保存データ、さらに失敗時はサンプルへ自動フォールバック
+- 商品名・型番・必須語句・除外語句による検索結果照合
+- 送料無料商品のみを検索対象に設定
+- 商品画像、販売ショップ名、商品ページリンクに対応
+- 取得価格を最大90日分保持し、過去平均・過去最安を段階的に実測値へ移行
+- ショップごとのProvider層、同一商品統合、送料・ポイント込み実質価格に対応
 - 他サイト中央値、過去平均、過去最安から総合スコアを算出
 - 判定理由と判定精度を商品詳細に表示
 - お気に入りを端末内に保存
 - PWA・GitHub Pages対応
 
-現在の各ProviderはUIと統合ロジックを検証するためのサンプル実装です。取得処理はProviderごとに交換できるため、正規API接続時も画面・判定エンジンを変更せず差し替えられます。
+楽天市場ProviderはAPI未設定時もアプリ全体を止めず、サンプル価格へ自動的に戻ります。実データを有効化する手順は[`docs/rakuten-api-setup.md`](docs/rakuten-api-setup.md)にまとめています。
 
 ## 構成
 
@@ -26,10 +29,22 @@ providers/provider-core.js
   └─ ProviderRegistry
 
 providers/sample-providers.js
-  ├─ Amazon Provider
-  ├─ 楽天市場 Provider
-  ├─ Yahoo! Provider
-  └─ 価格.com Provider
+  ├─ Amazon Sample Provider
+  ├─ 楽天市場 Sample Provider
+  ├─ Yahoo! Sample Provider
+  └─ 価格.com Reference Provider
+
+providers/rakuten-provider.js
+  └─ 実データ → 保存データ → サンプルの切替
+
+data/watchlist.json
+  └─ 監視商品・検索条件
+
+scripts/update-rakuten-data.mjs
+  └─ 楽天公式API取得・商品照合・価格履歴更新
+
+.github/workflows/update-rakuten-data.yml
+  └─ 定期取得とdeal-dataブランチへの公開
 
 deal-catalog.js
   └─ 同一商品の照合・価格統合
@@ -47,8 +62,8 @@ app.js
 
 ```javascript
 DealHunterProviders.register({
-  id: 'rakuten-live',
-  label: '楽天市場',
+  id: 'shop-live',
+  label: 'ショップ名',
   mode: 'live',
   async load(context) {
     return [
@@ -58,22 +73,35 @@ DealHunterProviders.register({
         model: 'MODEL-001',
         name: '商品名',
         category: '家電',
-        store: '楽天市場',
+        store: 'ショップ名',
         price: 10000,
         shipping: 0,
         points: 500,
-        url: '商品URL'
+        url: '商品URL',
+        image: '画像URL'
       }
     ];
   }
 });
 ```
 
+## 実データProviderの優先順位
+
+```text
+公開済みの最新フィード
+  ↓ 取得失敗
+端末内の保存済みフィード
+  ↓ 保存なし
+サンプルProvider
+```
+
+一部ショップが取得できなくても、成功したProviderだけでランキングを生成します。
+
 ## ロードマップ
 
-1. 楽天市場の正規API Provider
-2. Yahoo!ショッピングの正規API Provider
-3. JANコード・型番による商品照合精度の向上
-4. PostgreSQLへの価格履歴保存
-5. Amazonデータ取得経路の検討
-6. 値下がり通知とお気に入り監視
+1. Yahoo!ショッピングの正規API Provider
+2. JANコード・型番による商品照合精度の向上
+3. 商品監視リストの画面編集
+4. Amazonデータ取得経路の検討
+5. 値下がり通知とお気に入り監視
+6. 長期価格履歴用データストア
