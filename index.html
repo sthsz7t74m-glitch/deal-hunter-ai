@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="theme-color" content="#090b10" />
   <meta name="description" content="複数ECの価格と過去相場から、本当に安い商品を見つけるアプリ" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=2" />
   <title>Deal Hunter AI</title>
 </head>
 <body>
@@ -16,15 +16,15 @@
         <p class="eyebrow">DEAL HUNTER AI</p>
         <h1>今日の掘り出し物</h1>
       </div>
-      <span class="version">v0.1.0</span>
+      <span class="version">v0.2.0</span>
     </header>
 
     <main>
       <section class="hero-card">
         <div>
-          <p class="hero-label">本日の監視結果</p>
-          <strong><span id="dealCount">18</span>件の有力ディール</strong>
-          <p>他サイト相場と過去価格の両方から判定</p>
+          <p class="hero-label">相場＋過去価格の判定結果</p>
+          <strong><span id="dealCount">0</span>件の有力ディール</strong>
+          <p>他サイト中央値と過去価格の両方から自動計算</p>
         </div>
         <div class="radar">◎</div>
       </section>
@@ -42,8 +42,8 @@
           <h2>お得度ランキング</h2>
         </div>
         <select id="sortSelect" aria-label="並び替え">
-          <option value="score">AIスコア順</option>
-          <option value="discount">値引率順</option>
+          <option value="score">総合スコア順</option>
+          <option value="discount">相場差が大きい順</option>
           <option value="price">価格の安い順</option>
         </select>
       </section>
@@ -64,6 +64,7 @@
     <div id="detailContent"></div>
   </dialog>
 
-  <script src="app.js"></script>
+  <script src="deal-engine.js?v=1"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
