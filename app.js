@@ -14,6 +14,13 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
   "'": '&#039;'
 }[character]));
 
+const MODE_LABELS = Object.freeze({
+  live: '実データ',
+  cached: '保存データ',
+  sample: 'サンプル',
+  reference: '参考相場'
+});
+
 class DealHunterApp {
   constructor(root = document) {
     this.root = root;
@@ -76,22 +83,27 @@ class DealHunterApp {
     return this.sortDeals(items);
   }
 
+  modeLabel(mode) {
+    return MODE_LABELS[mode] || `${mode || '不明'}`;
+  }
+
   renderProviderStatus() {
     const statuses = this.state.providerStatuses;
     const ready = statuses.filter(status => status.status === 'ready').length;
     const offers = statuses.reduce((sum, status) => sum + status.count, 0);
+    const live = statuses.filter(status => ['live', 'cached'].includes(status.mode)).length;
 
     if (this.nodes.providerSummary) {
       this.nodes.providerSummary.textContent = this.state.loading
         ? 'データソースを読み込み中'
-        : `${ready}/${statuses.length}ソース接続・${offers}価格を比較`;
+        : `${ready}/${statuses.length}ソース接続・${offers}価格を比較${live ? `・実データ${live}` : ''}`;
     }
 
     if (this.nodes.providerStatuses) {
       this.nodes.providerStatuses.innerHTML = statuses.length
-        ? statuses.map(status => `<span class="provider-chip ${status.status}">
+        ? statuses.map(status => `<span class="provider-chip ${status.status} mode-${escapeHtml(status.mode)}">
             <i aria-hidden="true"></i>${escapeHtml(status.label)}
-            <small>${status.mode === 'sample' ? 'サンプル' : status.count + '件'}</small>
+            <small>${escapeHtml(this.modeLabel(status.mode))}${status.mode === 'live' ? ` ${status.count}件` : ''}</small>
           </span>`).join('')
         : '<span class="provider-chip loading"><i></i>接続準備中</span>';
     }
@@ -101,6 +113,11 @@ class DealHunterApp {
     if (this.nodes.dealCount) {
       this.nodes.dealCount.textContent = this.state.deals.filter(deal => deal.isDeal).length;
     }
+  }
+
+  productVisual(deal, imageClass = '') {
+    if (!deal.image) return `<span>${deal.icon}</span>`;
+    return `<img class="${imageClass}" src="${escapeHtml(deal.image)}" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span hidden>${deal.icon}</span>`;
   }
 
   renderItems(items, emptyMessage = '該当する商品はありません') {
@@ -127,11 +144,12 @@ class DealHunterApp {
   card(deal) {
     const hasBenefits = deal.points > 0 || deal.shipping > 0;
     const effectiveLabel = hasBenefits ? '実質' : '';
+    const mode = this.modeLabel(deal.providerMode);
 
     return `<article class="deal-card" data-id="${escapeHtml(deal.id)}">
-      <div class="product-icon">${deal.icon}</div>
+      <div class="product-icon">${this.productVisual(deal, 'product-image')}</div>
       <div>
-        <div class="store">${escapeHtml(deal.store)}・${escapeHtml(deal.category)}</div>
+        <div class="store">${escapeHtml(deal.store)}・${escapeHtml(deal.category)}${deal.providerMode ? `・${escapeHtml(mode)}` : ''}</div>
         <h3 class="product-name">${escapeHtml(deal.name)}</h3>
         <div class="price-row">
           <span class="price">${effectiveLabel}${yen(deal.currentPrice)}</span>
@@ -151,11 +169,18 @@ class DealHunterApp {
     const priceLabel = offer.effectivePrice !== offer.price
       ? `<small>${yen(offer.price)}${benefits.length ? `・${benefits.join('・')}` : ''}</small>`
       : '';
+    const shopName = offer.metadata?.shopName
+      ? `・${escapeHtml(offer.metadata.shopName)}`
+      : '';
+    const referenceLabel = offer.referenceOnly ? '（参考相場）' : index === 0 ? '（実質最安）' : '';
+    const content = `<span>${escapeHtml(offer.store)}${shopName}${referenceLabel}${priceLabel}</span>
+      <span class="offer-price"><strong>${yen(offer.effectivePrice)}</strong>${offer.url && !offer.referenceOnly ? '<small>商品を見る ›</small>' : ''}</span>`;
 
-    return `<div class="comparison-row ${index === 0 ? 'best' : ''}">
-      <span>${escapeHtml(offer.store)}${index === 0 ? '（実質最安）' : ''}${priceLabel}</span>
-      <strong>${yen(offer.effectivePrice)}</strong>
-    </div>`;
+    if (offer.url && !offer.referenceOnly) {
+      return `<a class="comparison-row offer-link ${index === 0 ? 'best' : ''}" href="${escapeHtml(offer.url)}" target="_blank" rel="noopener noreferrer">${content}</a>`;
+    }
+
+    return `<div class="comparison-row ${index === 0 ? 'best' : ''}">${content}</div>`;
   }
 
   openDetail(id) {
@@ -164,9 +189,12 @@ class DealHunterApp {
 
     const favorite = this.state.favorites.has(String(deal.id));
     const reasons = deal.reasons.map(reason => `<li>${escapeHtml(reason)}</li>`).join('');
+    const bestLink = deal.url
+      ? `<a class="buy-button" href="${escapeHtml(deal.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(deal.store)}で商品を見る</a>`
+      : '';
 
     this.nodes.detail.innerHTML = `<div class="detail-hero">
-        <div class="detail-icon">${deal.icon}</div>
+        <div class="detail-icon">${this.productVisual(deal, 'detail-product-image')}</div>
         <div>
           <div class="detail-score">DEAL SCORE ${deal.score}・${deal.grade}判定</div>
           <h2>${escapeHtml(deal.name)}</h2>
@@ -181,7 +209,8 @@ class DealHunterApp {
         <ul>${reasons}</ul>
         <small>他サイト中央値 ${yen(deal.marketMedian)} ／ 過去${deal.historyDays}日平均 ${yen(deal.historyAverage)} ／ 過去最安 ${yen(deal.historyLow)}</small>
       </div>
-      <button id="favoriteButton" class="chip active" style="width:100%;margin-top:16px">
+      ${bestLink}
+      <button id="favoriteButton" class="chip active" style="width:100%;margin-top:12px">
         ${favorite ? '♥ お気に入り解除' : '♡ お気に入りに追加'}
       </button>`;
 
