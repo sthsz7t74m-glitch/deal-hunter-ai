@@ -1,4 +1,4 @@
-const CACHE='deal-hunter-v0.3.0';
+const CACHE='deal-hunter-v0.3.0-provider2';
 const ASSETS=[
   './',
   './index.html',
