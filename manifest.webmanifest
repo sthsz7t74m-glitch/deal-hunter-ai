@@ -1,0 +1,11 @@
+{
+  "name": "Deal Hunter AI",
+  "short_name": "Deal Hunter",
+  "description": "複数ECの相場と過去価格から、本当に安い商品を見つけるアプリ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090b10",
+  "theme_color": "#090b10",
+  "lang": "ja",
+  "icons": []
+}
