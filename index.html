@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090b10" />
   <meta name="description" content="複数ECの価格と過去相場から、本当に安い商品を見つけるアプリ" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=3" />
   <title>Deal Hunter AI</title>
 </head>
 <body>
@@ -16,7 +16,7 @@
         <p class="eyebrow">DEAL HUNTER AI</p>
         <h1>今日の掘り出し物</h1>
       </div>
-      <span class="version">v0.2.0</span>
+      <span class="version">v0.3.0</span>
     </header>
 
     <main>
@@ -24,9 +24,20 @@
         <div>
           <p class="hero-label">相場＋過去価格の判定結果</p>
           <strong><span id="dealCount">0</span>件の有力ディール</strong>
-          <p>他サイト中央値と過去価格の両方から自動計算</p>
+          <p>複数ショップの価格を同一商品ごとに統合して自動判定</p>
         </div>
         <div class="radar">◎</div>
+      </section>
+
+      <section class="provider-panel" aria-label="価格データソース">
+        <div class="provider-heading">
+          <div>
+            <p class="eyebrow">DATA PROVIDERS</p>
+            <strong id="providerSummary">データソースを準備中</strong>
+          </div>
+          <button id="providerReload" class="provider-reload" type="button">再読込</button>
+        </div>
+        <div id="providerStatuses" class="provider-statuses"></div>
       </section>
 
       <section class="toolbar" aria-label="絞り込み">
@@ -65,6 +76,9 @@
   </dialog>
 
   <script src="deal-engine.js?v=1"></script>
-  <script src="app.js?v=2"></script>
+  <script src="providers/provider-core.js?v=1"></script>
+  <script src="providers/sample-providers.js?v=1"></script>
+  <script src="deal-catalog.js?v=1"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
