@@ -103,6 +103,7 @@ window.DealHunterSampleData = window.DealHunterSampleData || {};
     },
     kakaku: {
       label: '価格.com相場',
+      referenceOnly: true,
       offers: {
         'switch-2-pro-controller': { price: 7650 },
         'sony-wf-1000xm5': { price: 30240 },
@@ -133,6 +134,7 @@ window.DealHunterSampleData = window.DealHunterSampleData || {};
       id,
       label: provider.label,
       mode: 'sample',
+      referenceOnly: provider.referenceOnly,
       async load() {
         return createOffers(provider);
       }
