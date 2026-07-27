@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "products": [
+    {
+      "productKey": "switch-2-pro-controller",
+      "productId": 1,
+      "name": "Nintendo Switch 2 Proコントローラー",
+      "query": "Nintendo Switch 2 Proコントローラー",
+      "model": "BEE-A-FSSKA",
+      "category": "ゲーム",
+      "icon": "🎮",
+      "mustIncludeAny": ["Proコントローラー", "プロコントローラー", "BEE-A-FSSKA"],
+      "exclude": ["ケース", "カバー", "互換", "中古", "ジャンク"],
+      "seedHistoryAverage": 7350,
+      "seedHistoryLow": 6180,
+      "seedHistoryDays": 30
+    },
+    {
+      "productKey": "sony-wf-1000xm5",
+      "productId": 2,
+      "name": "SONY ワイヤレスイヤホン WF-1000XM5",
+      "query": "SONY WF-1000XM5",
+      "model": "WF-1000XM5",
+      "category": "家電",
+      "icon": "🎧",
+      "mustIncludeAny": ["WF-1000XM5"],
+      "exclude": ["ケース", "イヤーピース", "片耳", "中古", "整備済み"],
+      "seedHistoryAverage": 31100,
+      "seedHistoryLow": 26980,
+      "seedHistoryDays": 45
+    },
+    {
+      "productKey": "samsung-microsd-512gb",
+      "productId": 3,
+      "name": "Samsung microSD 512GB",
+      "query": "Samsung microSD 512GB",
+      "model": "MB-MC512KA",
+      "category": "家電",
+      "icon": "💾",
+      "mustIncludeAny": ["512GB", "MB-MC512KA"],
+      "exclude": ["中古", "バルク", "訳あり"],
+      "seedHistoryAverage": 5600,
+      "seedHistoryLow": 4480,
+      "seedHistoryDays": 60
+    },
+    {
+      "productKey": "pokemon-figure-set",
+      "productId": 4,
+      "name": "ポケットモンスター フィギュアセット",
+      "query": "ポケットモンスター フィギュア セット",
+      "model": "",
+      "category": "ホビー",
+      "icon": "🧸",
+      "mustIncludeAll": ["ポケットモンスター", "フィギュア"],
+      "exclude": ["中古", "単品", "ガチャ", "食玩"],
+      "seedHistoryAverage": 4980,
+      "seedHistoryLow": 3890,
+      "seedHistoryDays": 30
+    },
+    {
+      "productKey": "anker-powercore-10000",
+      "productId": 5,
+      "name": "Anker 10000mAh モバイルバッテリー",
+      "query": "Anker 10000mAh モバイルバッテリー A1259",
+      "model": "A1259",
+      "category": "家電",
+      "icon": "🔋",
+      "mustIncludeAny": ["A1259", "10000mAh"],
+      "exclude": ["ケース", "ケーブルのみ", "中古"],
+      "seedHistoryAverage": 4750,
+      "seedHistoryLow": 3980,
+      "seedHistoryDays": 30
+    },
+    {
+      "productKey": "ps5-new-game",
+      "productId": 6,
+      "name": "PlayStation 5 ゲームソフト 新作",
+      "query": "PlayStation 5 ゲームソフト",
+      "model": "",
+      "category": "ゲーム",
+      "icon": "🕹️",
+      "liveEnabled": false,
+      "seedHistoryAverage": 7080,
+      "seedHistoryLow": 6280,
+      "seedHistoryDays": 30
+    }
+  ]
+}
