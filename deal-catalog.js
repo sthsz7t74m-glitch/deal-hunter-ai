@@ -21,14 +21,17 @@ window.DealHunterCatalog = window.DealHunterCatalog || {};
     return groups;
   };
 
-  function productFromOffers(productKey, offers) {
-    const sortedOffers = [...offers].sort(compareOffers);
-    const best = sortedOffers[0];
-    const historyAverage = firstPositive(sortedOffers.map(offer => offer.historyAverage));
-    const historyLow = firstPositive(sortedOffers.map(offer => offer.historyLow));
-    const historyDays = Math.max(...sortedOffers.map(offer => Number(offer.historyDays) || 0), 0);
+  function productFromOffers(productKey, offers, engine = Engine) {
+    const allOffers = [...offers].sort(compareOffers);
+    const purchasableOffers = allOffers.filter(offer => !offer.referenceOnly);
+    const referenceOffers = allOffers.filter(offer => offer.referenceOnly);
+    const best = purchasableOffers[0] || allOffers[0];
+    const displayOffers = [...purchasableOffers, ...referenceOffers];
+    const historyAverage = firstPositive(allOffers.map(offer => offer.historyAverage));
+    const historyLow = firstPositive(allOffers.map(offer => offer.historyLow));
+    const historyDays = Math.max(...allOffers.map(offer => Number(offer.historyDays) || 0), 0);
 
-    return Engine.evaluate({
+    return engine.evaluate({
       id: best.productId,
       productKey,
       jan: best.jan,
@@ -44,10 +47,12 @@ window.DealHunterCatalog = window.DealHunterCatalog || {};
       historyAverage,
       historyLow,
       historyDays,
-      stores: sortedOffers.map(offer => [offer.store, offer.effectivePrice]),
-      offers: sortedOffers,
-      sourceModes: [...new Set(sortedOffers.map(offer => offer.providerMode))],
-      fetchedAt: sortedOffers
+      stores: allOffers.map(offer => [offer.store, offer.effectivePrice]),
+      offers: displayOffers,
+      buyableOfferCount: purchasableOffers.length,
+      referenceOfferCount: referenceOffers.length,
+      sourceModes: [...new Set(allOffers.map(offer => offer.providerMode))],
+      fetchedAt: allOffers
         .map(offer => offer.fetchedAt)
         .filter(Boolean)
         .sort()
@@ -66,7 +71,7 @@ window.DealHunterCatalog = window.DealHunterCatalog || {};
     async load(context = {}) {
       const result = await this.registry.loadAll(context);
       const products = [...groupOffers(result.offers).entries()]
-        .map(([productKey, offers]) => productFromOffers(productKey, offers))
+        .map(([productKey, offers]) => productFromOffers(productKey, offers, this.engine))
         .sort((left, right) => right.score - left.score || left.currentPrice - right.currentPrice);
 
       return Object.freeze({
